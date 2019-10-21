@@ -1,33 +1,40 @@
+/*
+ *   Copyright (c) 2019 OpenEye Scientific
+ *   All rights reserved.
+ */
+
 d3.starPlot = function() {
   var width = 200,
-      margin = {
-        top: 0,
-        right: 0,
-        bottom: 0,
-        left: 0
-      },
-      labelMargin = 20,
-      includeGuidelines = true,
-      includeLabels = true,
-      properties = [],
-      scales = [],
-      labels = nop,
-      title = nop,
-
-      g,
-      datum,
-      radius = width / 2,
-      origin = [radius, radius],
-      radii = properties.length,
-      radians = 2 * Math.PI / radii,
-      scale = d3.scale.linear()
-        .domain([0, 100])
-        .range([0, radius])
+    margin = {
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0
+    },
+    labelMargin = 20,
+    includeGuidelines = true,
+    includeLabels = true,
+    properties = [],
+    scales = [],
+    labels = nop,
+    title = nop,
+    g,
+    datum,
+    radius = width / 2,
+    origin = [radius, radius],
+    radii = properties.length,
+    radians = (2 * Math.PI) / radii,
+    scale = d3.scale
+      .linear()
+      .domain([0, 100])
+      .range([0, radius]);
 
   function chart(selection) {
     datum = selection.datum();
-    g = selection
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    g = selection.attr(
+      "transform",
+      "translate(" + margin.left + "," + margin.top + ")"
+    );
 
     if (includeGuidelines) {
       drawGuidelines();
@@ -48,15 +55,15 @@ d3.starPlot = function() {
       l = radius;
       x = l * Math.cos(r);
       y = l * Math.sin(r);
-      g.append('line')
-        .attr('class', 'star-axis')
-        .attr('x1', origin[0])
-        .attr('y1', origin[1])
-        .attr('x2', origin[0] + x)
-        .attr('y2', origin[1] + y)
+      g.append("line")
+        .attr("class", "star-axis")
+        .attr("x1", origin[0])
+        .attr("y1", origin[1])
+        .attr("x2", origin[0] + x)
+        .attr("y2", origin[1] + y);
 
       r += radians;
-    })
+    });
   }
 
   function drawLabels() {
@@ -67,49 +74,49 @@ d3.starPlot = function() {
       l = radius;
       x = (l + labelMargin) * Math.cos(r);
       y = (l + labelMargin) * Math.sin(r);
-      g.append('text')
-        .attr('class', 'star-label')
-        .attr('x', origin[0] + x)
-        .attr('y', origin[1] + y)
-        .text(typeof labels == "function" ? labels(datum, i) : labels[i])
-        .style('text-anchor', 'middle')
-        .style('dominant-baseline', 'central')
+      var fo = g
+        .append("foreignObject")
+        .attr("class", "star-label")
+        .attr("x", origin[0] + x)
+        .attr("y", origin[1] + y);
+
+      var p = fo.append("xhtml:p");
+      p.text(typeof labels == "function" ? labels(datum, i) : labels[i])
+        .style("text-anchor", "middle")
+        .style("dominant-baseline", "central");
 
       r += radians;
-    })
+    });
   }
 
   function drawChart() {
-    g.append('circle')
-      .attr('class', 'star-origin')
-      .attr('cx', origin[0])
-      .attr('cy', origin[1])
-      .attr('r', 2)
+    g.append("circle")
+      .attr("class", "star-origin")
+      .attr("cx", origin[0])
+      .attr("cy", origin[1])
+      .attr("r", 2);
 
-    var path = d3.svg.line.radial()
+    var path = d3.svg.line.radial();
 
     var pathData = [];
     var r = Math.PI / 2;
     properties.forEach(function(d, i) {
       var userScale = scales[i] || scales[0];
-      pathData.push([
-        scale(userScale(datum[d])),
-        r
-      ])
+      pathData.push([scale(userScale(datum[d])), r]);
       r += radians;
     });
 
-    g.append('path')
-      .attr('class', 'star-path')
-      .attr('transform', 'translate(' + origin[0] + ',' + origin[1] + ')')
-      .attr('d', path(pathData) + 'Z');
+    g.append("path")
+      .attr("class", "star-path")
+      .attr("transform", "translate(" + origin[0] + "," + origin[1] + ")")
+      .attr("d", path(pathData) + "Z");
 
-    g.append('text')
-      .attr('class', 'star-title')
-      .attr('x', origin[0])
-      .attr('y', -(margin.top / 2))
+    g.append("text")
+      .attr("class", "star-title")
+      .attr("x", origin[0])
+      .attr("y", -(margin.top / 2))
       .text(title(datum))
-      .style('text-anchor', 'middle')
+      .style("text-anchor", "middle");
   }
 
   function drawInteraction() {
@@ -154,15 +161,15 @@ d3.starPlot = function() {
         datum: datum
       };
 
-      g.append('path')
+      g.append("path")
         .datum(datumToBind)
-        .attr('class', 'star-interaction')
-        .attr('transform', 'translate(' + origin[0] + ',' + origin[1] + ')')
-        .attr('d', path(pathData) + 'Z');
+        .attr("class", "star-interaction")
+        .attr("transform", "translate(" + origin[0] + "," + origin[1] + ")")
+        .attr("d", path(pathData) + "Z");
 
       rInteraction += radians;
       rExtent += radians;
-    })
+    });
   }
 
   function nop() {
@@ -177,7 +184,7 @@ d3.starPlot = function() {
     if (!arguments.length) return properties;
     properties = _;
     radii = properties.length;
-    radians = 2 * Math.PI / radii;
+    radians = (2 * Math.PI) / radii;
     return chart;
   };
 
@@ -196,7 +203,7 @@ d3.starPlot = function() {
     width = _;
     radius = width / 2;
     origin = [radius, radius];
-    scale.range([0, radius])
+    scale.range([0, radius]);
     return chart;
   };
 
@@ -238,5 +245,4 @@ d3.starPlot = function() {
   };
 
   return chart;
-}
-
+};
